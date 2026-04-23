@@ -1,32 +1,24 @@
 package chess
- import (
+
+import (
 	"database/sql"
 	"fmt"
-	"os"
-	"path/filepath"
+
+	_ "embed"
+
+	"github.com/maiar0/game-website/backend/internal/shared"
 	_ "modernc.org/sqlite"
- )
+)
 
- func CreateDB( dbPath string, schemaPath string)(*sql.DB, error){
-	if err := os.MkdirAll(filepath.Dir(dbPath), 0o755); err != nil {
-		return nil, fmt.Errorf("create db directory : %w", err)
-	}
+//go:embed chess.sql
+var schema string
 
-	db, err := sql.Open("sqlite", dbPath)
+const baseDir = "storage/games/chess"
+
+func NewGame(id string) (*sql.DB, error) {
+	db, err := shared.CreateDB(baseDir + id +".db", schema)
 	if err != nil {
-		return nil, fmt.Errorf("open sqlite db: %w", err)
+		return nil, fmt.Errorf("error creating new game: %w", err)
 	}
-
-	schema, err := os.ReadFile(schemaPath)
-	if err != nil {
-		db.Close()
-		return nil, fmt.Errorf("read schema file: %w", err)
-	}
-
-	if _, err := db.Exec(string(schema)); err != nil {
-		db.Close()
-		return nil, fmt.Errorf("apply schema: %w", err)
-	}
-
-	return db, nil
- }
+	return db, err
+}

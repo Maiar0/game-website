@@ -7,7 +7,7 @@ import (
 
 func main() {
 	fmt.Println("hello")
-	db, err := chess.CreateDB("internal/chess/gamesdb/1234.db", "internal/chess/chess.sql")
+	db, err := chess.NewGame("mynewgame234")
 	if err != nil {
 		panic(err)
 	}

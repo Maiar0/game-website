@@ -1,18 +1,15 @@
 package chess
 
 import (
-	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/require"
 	_ "modernc.org/sqlite"
 )
-
-func TestCreateDB(t *testing.T) {
-	tmpDir := t.TempDir()
-	dbPath := filepath.Join(tmpDir, "1234.db")
+func TestNewGame(t *testing.T) {
+	id := "MytestID"
 	//check connection to db
-	db, err := CreateDB(dbPath, "chess.sql")
+	db, err := NewGame(id)
 	require.NoError(t, err)
 	require.NotNil(t, db)
 	//check schema applied

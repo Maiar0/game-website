@@ -9,7 +9,6 @@ import (
 	_ "modernc.org/sqlite"
 )
 
-
 func CreateDB(dbPath string, schema string) (*sql.DB, error) {
 	if err := os.MkdirAll(filepath.Dir(dbPath), 0o755); err != nil {
 		return nil, fmt.Errorf("create db directory: %w", err)
@@ -29,13 +28,17 @@ func CreateDB(dbPath string, schema string) (*sql.DB, error) {
 }
 
 func OpenSQLite(path string) (*sql.DB, error) {
+	//ensures we only OPEN databases not create
+	if _, err := os.Stat(path); err != nil {
+		return nil, fmt.Errorf("database does not exist: %w", err)
+	}
+
 	db, err := sql.Open("sqlite", path)
 	if err != nil {
 		return nil, fmt.Errorf("open sqlite: %w", err)
 	}
 
 	// Let database/sql reuse a small connection pool.
-	// You can raise this later if needed.
 	db.SetMaxOpenConns(4)
 	db.SetMaxIdleConns(4)
 

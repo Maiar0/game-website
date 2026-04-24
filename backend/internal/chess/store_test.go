@@ -6,10 +6,10 @@ import (
 	"github.com/stretchr/testify/require"
 	_ "modernc.org/sqlite"
 )
+
 func TestNewGame(t *testing.T) {
-	id := "MytestID"
 	//check connection to db
-	db, err := NewGame(id)
+	db, _, err := NewGame()
 	require.NoError(t, err)
 	require.NotNil(t, db)
 	//check schema applied
@@ -23,4 +23,13 @@ func TestNewGame(t *testing.T) {
 	require.Equal(t, "game_state", name)
 
 	defer db.Close()
+}
+
+func TestGetDB(t *testing.T) {
+	nbd, id, _ := NewGame()
+	nbd.Close()
+	db, err := GetDB(id)
+	require.NoError(t, err)
+	require.NotNil(t, db)
+
 }

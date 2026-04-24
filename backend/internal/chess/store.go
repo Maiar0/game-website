@@ -3,6 +3,7 @@ package chess
 import (
 	"database/sql"
 	"fmt"
+	"path/filepath"
 
 	_ "embed"
 
@@ -17,12 +18,18 @@ const baseDir = "storage/games/chess"
 
 var dbConnections = shared.NewDBManager()
 
-func NewGame(id string) (*sql.DB, error) {
+func NewGame() (*sql.DB, string, error) {
+	id, err := getNewId()
+	if err != nil {
+		return nil, "", fmt.Errorf("error creating new game: %w", err)
+	}
+
 	db, err := shared.CreateDB(baseDir+id+".db", schema)
 	if err != nil {
-		return nil, fmt.Errorf("error creating new game: %w", err)
+		return nil, "", fmt.Errorf("error creating new game: %w", err)
 	}
-	return db, err
+	
+	return db, id, err
 }
 
 func GetDB(id string) (*sql.DB, error) {
@@ -31,4 +38,14 @@ func GetDB(id string) (*sql.DB, error) {
 		return nil, fmt.Errorf("error getting game: %w", err)
 	}
 	return db, err
+}
+
+func getNewId() (string, error) {
+	for i := 0; i < 10; i++ {
+		id, err := shared.RandomID(9)
+		if !shared.FileExists(filepath.Join(baseDir, id+".db")) {
+			return id, err
+		}
+	}
+	return "", fmt.Errorf("failed to generate unique id after 10 attempts")
 }

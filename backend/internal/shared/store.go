@@ -10,6 +10,11 @@ import (
 )
 
 func CreateDB(dbPath string, schema string) (*sql.DB, error) {
+	//creates DB do not want to open an existing
+	if _, err := os.Stat(dbPath); err == nil {
+		return nil, fmt.Errorf("database already exists: %s", dbPath)
+	}
+
 	if err := os.MkdirAll(filepath.Dir(dbPath), 0o755); err != nil {
 		return nil, fmt.Errorf("create db directory: %w", err)
 	}

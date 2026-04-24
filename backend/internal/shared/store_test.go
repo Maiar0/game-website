@@ -35,3 +35,23 @@ func TestCreateDB(t *testing.T) {
 
 	defer db.Close()
 }
+
+
+func TestOpenSQLite(t *testing.T) {
+	tmpDir := t.TempDir()
+	dbPath := filepath.Join(tmpDir, "1234.db")
+	schema := `
+		CREATE TABLE IF NOT EXISTS test_table (
+			id INTEGER PRIMARY KEY,
+			name TEXT NOT NULL
+		);
+	`
+	cdb, _ := CreateDB(dbPath, schema)
+
+	cdb.Close()
+
+	db, err := OpenSQLite(dbPath)
+
+	require.NoError(t, err)
+	require.NotNil(t, db)
+}

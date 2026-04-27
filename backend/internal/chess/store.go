@@ -14,7 +14,7 @@ import (
 //go:embed chess.sql
 var schema string
 
-const baseDir = "storage/games/chess"
+const baseDir = "storage/games/chess/"
 
 var dbConnections = shared.NewDBManager()
 
@@ -28,7 +28,7 @@ func NewGame() (*sql.DB, string, error) {
 	if err != nil {
 		return nil, "", fmt.Errorf("error creating new game: %w", err)
 	}
-	
+
 	return db, id, err
 }
 

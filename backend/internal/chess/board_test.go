@@ -69,7 +69,6 @@ func TestMovePiece(t *testing.T) {
 func TestCapturePiece(t *testing.T) {
 	var board Board
 	board.Fill("rnbqkbnr/pppppppp/8/2p5/1P6/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1")
-	PrintBoard(board)
 	from, _ := ConvertCoordinates("c5")
 	to, _ := ConvertCoordinates("b4")
 	piece, err := board.CapturePiece(from, to)

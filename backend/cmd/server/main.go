@@ -14,7 +14,7 @@ func main() {
 	fmt.Println("tt:")
 	chess.PrintBoard(board)
 
-	pos, _ := chess.ConvertCoordinates("c5")
+	pos, _ := chess.ConvertCoordinates("d5")
 	piece, _ := chess.GetPiece(board, pos)
 	fmt.Printf("Piece at: %c\n", piece)
 }

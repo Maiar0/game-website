@@ -56,7 +56,7 @@ func ConvertCoordinates(coord string) (Position, error) {
 	if row < 0 || row > 7 || col < 0 || col > 7 {
 		return Position{}, fmt.Errorf("invalid coordinate: %s", coord)
 	}
-	//fmt.Printf("Converted %s to row: %d, col: %d\n", coord, row, col)
+	fmt.Printf("Converted %s to row: %d, col: %d\n", coord, row, col)
 	return Position{row: row, col: col}, nil
 }
 

@@ -9,7 +9,7 @@ type Direction struct {
 	DY int
 }
 
-func CheckMove(piece rune, from Position, to Position) (bool, rune, error) {
+func ValidateMovePattern(piece rune, from Position, to Position) (bool, rune, error) {
 	var dy = from.col - to.col
 	var dx = from.row - to.row
 	if dx == 0 && dy == 0 {
@@ -26,15 +26,18 @@ func CheckMove(piece rune, from Position, to Position) (bool, rune, error) {
 			return true, 'm', nil
 		case dy == 0 && dx == 2 && from.row == 1:
 			return true, 'd', nil
+		case abs(dy) == 1 && dx == 1:
+			return true, 'c', nil
 		}
 	case 'P':
+		dy *= -1
 		switch {
 		case dy == 0 && dx == 1:
 			return true, 'm', nil
 		case dy == 0 && dx == 2 && from.row == 1:
 			return true, 'd', nil
 		case abs(dy) == 1 && dx == 1:
-			return false, '0', fmt.Errorf("this is a capture: %v", from)
+			return true, 'c', nil
 		}
 	case 'r', 'R':
 		if (dx == 0 && dy != 0) || (dy == 0 && dx != 0) {
@@ -103,7 +106,7 @@ func inBounds(pos Position) bool {
 	return true
 }
 
-func checkPath(b Board, from Position, to Position) bool {
+func CheckPath(b Board, from Position, to Position) bool {
 	dx := sign(from.row - to.row)
 	dy := sign(from.col - to.col)
 	cur := from

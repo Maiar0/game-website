@@ -9,66 +9,74 @@ type Direction struct {
 	DY int
 }
 
-func ValidateMovePattern(piece rune, from Position, to Position) (bool, rune, error) {
-	var dy = from.col - to.col
-	var dx = from.row - to.row
+func ValidateMovePattern(piece rune, from Position, to Position) (bool, error) {
+	dy := from.col - to.col
+	dx := from.row - to.row
+
 	if dx == 0 && dy == 0 {
-		return false, '0', fmt.Errorf("to position matchs from position: %v, %v", to, from)
+		return false, fmt.Errorf("to position matches from position: %v, %v", to, from)
 	}
-	if inBounds(to) {
-		return false, '0', fmt.Errorf("to position out of bound: %v", to)
+
+	if !inBounds(to) {
+		return false, fmt.Errorf("to position out of bounds: %v", to)
 	}
+
 	switch piece {
 	case 'p':
-		dy *= -1
+		fmt.Printf("Pawn Move %v, %v", dy, dx)
 		switch {
 		case dy == 0 && dx == 1:
-			return true, 'm', nil
-		case dy == 0 && dx == 2 && from.row == 1:
-			return true, 'd', nil
+			return true, nil
+		case dy == 0 && dx == 2 && from.row == 6:
+			return true, nil
 		case abs(dy) == 1 && dx == 1:
-			return true, 'c', nil
+			return true, nil
 		}
+
 	case 'P':
-		dy *= -1
+		dx *= -1
+		fmt.Printf("Pawn Move %v, %v", dy, dx)
 		switch {
 		case dy == 0 && dx == 1:
-			return true, 'm', nil
+			return true, nil
 		case dy == 0 && dx == 2 && from.row == 1:
-			return true, 'd', nil
+			return true, nil
 		case abs(dy) == 1 && dx == 1:
-			return true, 'c', nil
+			return true, nil
 		}
+
 	case 'r', 'R':
 		if (dx == 0 && dy != 0) || (dy == 0 && dx != 0) {
-			return true, 'm', nil
+			return true, nil
 		}
+
 	case 'n', 'N':
 		for _, dir := range knightDirections {
 			if dx == dir.DX && dy == dir.DY {
-				return true, 'm', nil
+				return true, nil
 			}
 		}
+
 	case 'b', 'B':
 		if abs(dx) == abs(dy) {
-			return true, 'm', nil
+			return true, nil
 		}
+
 	case 'q', 'Q':
-		if abs(dx) == abs(dy) {
-			return true, 'm', nil
+		if abs(dx) == abs(dy) || (dx == 0 && dy != 0) || (dy == 0 && dx != 0) {
+			return true, nil
 		}
-		if (dx == 0 && dy != 0) || (dy == 0 && dx != 0) {
-			return true, 'm', nil
-		}
+
 	case 'k', 'K':
 		if abs(dx) <= 1 && abs(dy) <= 1 {
-			return true, 'm', nil
+			return true, nil
 		}
-	default:
-		return false, '0', fmt.Errorf("invalid char: %s", piece)
 
+	default:
+		return false, fmt.Errorf("invalid piece: %c", piece)
 	}
-	return false, '0', nil
+
+	return false, nil
 }
 
 func abs(x int) int {

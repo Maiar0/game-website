@@ -87,3 +87,56 @@ var knightDirections = []Direction{
 	{DX: -1, DY: 2},
 	{DX: -1, DY: -2},
 }
+
+func IsSquareAttacked(b Board, pos Position, attackColor rune) bool {
+	//west
+	p, _, found := FindPieceInDirection(b, pos, -1, 0)
+	if found && PieceColor(p) == attackColor {
+		switch p {
+		case 'r', 'R', 'q', 'Q':
+			return true
+		}
+	}
+	//east
+	p, _, found = FindPieceInDirection(b, pos, 1, 0)
+	if found && PieceColor(p) == attackColor {
+		switch p {
+		case 'r', 'R', 'q', 'Q':
+			return true
+		}
+	}
+	//nw
+	p, _, found = FindPieceInDirection(b, pos, -1, 1)
+	if found && PieceColor(p) == attackColor {
+		switch p {
+		case 'b', 'B', 'q', 'Q':
+			return true
+		}
+	}
+	//ne
+	p, _, found = FindPieceInDirection(b, pos, 1, 1)
+	if found && PieceColor(p) == attackColor {
+		switch p {
+		case 'b', 'B', 'q', 'Q':
+			return true
+		}
+	}
+
+	for _, dir := range knightDirections {
+		cur := pos
+		cur.row += dir.DX
+		cur.col += dir.DY
+
+		if !InBounds(cur) {
+			continue
+		}
+
+		p, _ := GetPiece(b, cur)
+
+		if PieceColor(p) == attackColor && (p == 'n' || p == 'N') {
+			return true
+		}
+	}
+
+	return false
+}

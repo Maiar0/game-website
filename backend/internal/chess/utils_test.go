@@ -118,9 +118,131 @@ func TestCheckPath(t *testing.T) {
 			if tt.blocker != nil {
 				b[tt.blocker.row][tt.blocker.col] = 'p'
 			}
-			PrintBoard(b)
 
 			require.Equal(t, tt.want, CheckPath(b, tt.from, tt.to))
+		})
+	}
+}
+
+func TestFindPieceInDirection(t *testing.T) {
+	emptyBoard := func() Board {
+		var b Board
+		for row := range b {
+			for col := range b[row] {
+				b[row][col] = '.'
+			}
+		}
+		return b
+	}
+
+	tests := []struct {
+		name      string
+		from      Position
+		drow      int
+		dcol      int
+		pieces    map[Position]rune
+		wantPiece rune
+		wantPos   Position
+		wantFound bool
+	}{
+		{
+			name:      "finds piece upward",
+			from:      Position{row: 0, col: 4},
+			drow:      1,
+			dcol:      0,
+			pieces:    map[Position]rune{Position{row: 3, col: 4}: 'r'},
+			wantPiece: 'r',
+			wantPos:   Position{row: 3, col: 4},
+			wantFound: true,
+		},
+		{
+			name: "finds first piece only",
+			from: Position{row: 0, col: 4},
+			drow: 1,
+			dcol: 0,
+			pieces: map[Position]rune{
+				Position{row: 2, col: 4}: 'p',
+				Position{row: 5, col: 4}: 'q',
+			},
+			wantPiece: 'p',
+			wantPos:   Position{row: 2, col: 4},
+			wantFound: true,
+		},
+		{
+			name:      "finds piece horizontally",
+			from:      Position{row: 4, col: 0},
+			drow:      0,
+			dcol:      1,
+			pieces:    map[Position]rune{Position{row: 4, col: 6}: 'b'},
+			wantPiece: 'b',
+			wantPos:   Position{row: 4, col: 6},
+			wantFound: true,
+		},
+		{
+			name:      "finds piece diagonally",
+			from:      Position{row: 1, col: 1},
+			drow:      1,
+			dcol:      1,
+			pieces:    map[Position]rune{Position{row: 5, col: 5}: 'q'},
+			wantPiece: 'q',
+			wantPos:   Position{row: 5, col: 5},
+			wantFound: true,
+		},
+		{
+			name:      "does not check starting square",
+			from:      Position{row: 2, col: 2},
+			drow:      1,
+			dcol:      0,
+			pieces:    map[Position]rune{Position{row: 2, col: 2}: 'k'},
+			wantPiece: '.',
+			wantPos:   Position{},
+			wantFound: false,
+		},
+		{
+			name:      "returns false when no piece found",
+			from:      Position{row: 3, col: 3},
+			drow:      1,
+			dcol:      0,
+			pieces:    nil,
+			wantPiece: '.',
+			wantPos:   Position{},
+			wantFound: false,
+		},
+		{
+			name:      "returns false when immediately out of bounds",
+			from:      Position{row: 7, col: 7},
+			drow:      1,
+			dcol:      0,
+			pieces:    nil,
+			wantPiece: '.',
+			wantPos:   Position{},
+			wantFound: false,
+		},
+		{
+			name:      "finds piece going negative direction",
+			from:      Position{row: 7, col: 7},
+			drow:      -1,
+			dcol:      -1,
+			pieces:    map[Position]rune{Position{row: 4, col: 4}: 'n'},
+			wantPiece: 'n',
+			wantPos:   Position{row: 4, col: 4},
+			wantFound: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			b := emptyBoard()
+
+			for pos, piece := range tt.pieces {
+				b[pos.row][pos.col] = piece
+			}
+
+			gotPiece, gotPos, gotFound := FindPieceInDirection(b, tt.from, tt.drow, tt.dcol)
+
+			require.Equal(t, tt.wantPiece, gotPiece)
+			require.Equal(t, tt.wantPos, gotPos)
+			require.Equal(t, tt.wantFound, gotFound)
 		})
 	}
 }

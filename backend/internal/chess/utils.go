@@ -58,6 +58,24 @@ func CheckPath(b Board, from Position, to Position) bool {
 	return true
 }
 
+func FindPieceInDirection(b Board, from Position, drow int, dcol int) (rune, Position, bool) {
+	cur := from
+	for {
+		cur.row += drow
+		cur.col += dcol
+
+		if !InBounds(cur) {
+			break
+		}
+
+		p, _ := GetPiece(b, cur)
+		if p != '.' {
+			return p, cur, true
+		}
+	}
+	return '.', Position{}, false
+}
+
 func Abs(x int) int {
 	if x < 0 {
 		return -x
@@ -73,4 +91,15 @@ func Sign(n int) int {
 		return -1
 	}
 	return 0
+}
+
+func PieceColor(piece rune) rune {
+	switch {
+	case piece >= 'A' && piece <= 'Z':
+		return 'w'
+	case piece >= 'a' && piece <= 'z':
+		return 'b'
+	default:
+		return '.'
+	}
 }

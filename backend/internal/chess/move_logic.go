@@ -9,6 +9,35 @@ type Direction struct {
 	DY int
 }
 
+func ValidateMove(b Board, from Position, to Position, turnColor rune) (bool, error) {
+	fromP, err := GetPiece(b, from)
+	if err != nil {
+		return false, err
+	}
+	if fromP == '.' {
+		return false, fmt.Errorf("No Piece at From: %v ", from)
+	}
+	if PieceColor(fromP) == turnColor {
+		return false, fmt.Errorf("Not players Piece: %v", from)
+	}
+	toP, err := GetPiece(b, to)
+	if err != nil {
+		return false, err
+	}
+	if PieceColor(toP) == turnColor {
+		return false, fmt.Errorf("Can not capture your own Piece: %v", toP)
+	}
+	validPattern, err := ValidateMovePattern(fromP, from, to)
+	if err != nil {
+		return false, err
+	}
+	if !validPattern {
+		return false, fmt.Errorf("Illegal Move")
+	}
+
+	return true, nil
+}
+
 func ValidateMovePattern(piece rune, from Position, to Position) (bool, error) {
 	dy := from.col - to.col
 	dx := from.row - to.row
@@ -69,6 +98,9 @@ func ValidateMovePattern(piece rune, from Position, to Position) (bool, error) {
 		if Abs(dx) <= 1 && Abs(dy) <= 1 {
 			return true, nil
 		}
+		if IsCastlePattern(piece, from, to) {
+			return true, nil
+		}
 
 	default:
 		return false, fmt.Errorf("invalid piece: %c", piece)
@@ -121,7 +153,7 @@ func IsSquareAttacked(b Board, pos Position, attackColor rune) bool {
 			return true
 		}
 	}
-
+	//knights
 	for _, dir := range knightDirections {
 		cur := pos
 		cur.row += dir.DX
@@ -136,6 +168,20 @@ func IsSquareAttacked(b Board, pos Position, attackColor rune) bool {
 		if PieceColor(p) == attackColor && (p == 'n' || p == 'N') {
 			return true
 		}
+	}
+
+	return false
+}
+
+func IsCastlePattern(piece rune, from Position, to Position) bool {
+	switch piece {
+	case 'K':
+		return from == (Position{row: 0, col: 4}) &&
+			(to == (Position{row: 0, col: 6}) || to == (Position{row: 0, col: 2}))
+
+	case 'k':
+		return from == (Position{row: 7, col: 4}) &&
+			(to == (Position{row: 7, col: 6}) || to == (Position{row: 7, col: 2}))
 	}
 
 	return false

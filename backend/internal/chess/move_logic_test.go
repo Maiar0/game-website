@@ -26,6 +26,10 @@ func TestValidateMovePattern_ValidMoves(t *testing.T) {
 		{"queen diagonal", 'Q', Position{row: 0, col: 0}, Position{row: 4, col: 4}},
 		{"queen straight", 'q', Position{row: 0, col: 0}, Position{row: 0, col: 5}},
 		{"king one square", 'K', Position{row: 4, col: 4}, Position{row: 5, col: 5}},
+		{"white kingside castle", 'K', Position{row: 0, col: 4}, Position{row: 0, col: 6}},
+		{"white queenside castle", 'K', Position{row: 0, col: 4}, Position{row: 0, col: 2}},
+		{"black kingside castle", 'k', Position{row: 7, col: 4}, Position{row: 7, col: 6}},
+		{"black queenside castle", 'k', Position{row: 7, col: 4}, Position{row: 7, col: 2}},
 	}
 
 	for _, tt := range tests {
@@ -49,6 +53,9 @@ func TestValidateMovePattern_InvalidMoves(t *testing.T) {
 		{"bishop straight", 'B', Position{row: 0, col: 0}, Position{row: 0, col: 3}},
 		{"knight straight", 'N', Position{row: 0, col: 0}, Position{row: 0, col: 2}},
 		{"king too far", 'K', Position{row: 0, col: 0}, Position{row: 2, col: 2}},
+		{"king two squares vertical", 'K', Position{row: 4, col: 4}, Position{row: 6, col: 4}},
+		{"king two squares diagonal", 'K', Position{row: 4, col: 4}, Position{row: 6, col: 6}},
+		{"king two squares horizontal not castle", 'K', Position{row: 4, col: 4}, Position{row: 4, col: 6}},
 		{"queen invalid", 'Q', Position{row: 0, col: 0}, Position{row: 2, col: 3}},
 	}
 

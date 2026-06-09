@@ -34,8 +34,8 @@ func (b *Board) Fill(fen string) {
 }
 
 func GetPiece(b Board, pos Position) (rune, error) {
-	if pos.row < 0 || pos.row > 7 || pos.col < 0 || pos.col > 7 {
-		return '0', fmt.Errorf("invalid position: row %d, col %d", pos.row, pos.col)
+	if !InBounds(pos){
+		return '0', fmt.Errorf("Position Out of Bounds: %v", pos)
 	}
 	return b[pos.row][pos.col], nil
 }

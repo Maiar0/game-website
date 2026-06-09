@@ -23,7 +23,6 @@ func ValidateMovePattern(piece rune, from Position, to Position) (bool, error) {
 
 	switch piece {
 	case 'p':
-		fmt.Printf("Pawn Move %v, %v", dy, dx)
 		switch {
 		case dy == 0 && dx == 1:
 			return true, nil
@@ -35,7 +34,6 @@ func ValidateMovePattern(piece rune, from Position, to Position) (bool, error) {
 
 	case 'P':
 		dx *= -1
-		fmt.Printf("Pawn Move %v, %v", dy, dx)
 		switch {
 		case dy == 0 && dx == 1:
 			return true, nil
@@ -115,16 +113,21 @@ func inBounds(pos Position) bool {
 }
 
 func CheckPath(b Board, from Position, to Position) bool {
-	dx := sign(from.row - to.row)
-	dy := sign(from.col - to.col)
+	dx := sign(to.row - from.row)
+	dy := sign(to.col - from.col)
+
 	cur := from
-	for i := 0; i < 7; i++ {
+
+	for cur != to {
 		cur.row += dx
 		cur.col += dy
+
 		p, _ := GetPiece(b, cur)
+
 		if p != '.' && cur != to {
 			return false
 		}
 	}
+
 	return true
 }

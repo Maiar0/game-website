@@ -33,33 +33,6 @@ func (b *Board) Fill(fen string) {
 	}
 }
 
-func PrintBoard(b [8][8]rune) {
-	for i := 0; i < 8; i++ {
-		for j := 0; j < 8; j++ {
-			if j == 0 {
-				fmt.Printf("%d ", i)
-			}
-			fmt.Printf("%c ", b[i][j])
-		}
-		fmt.Println()
-	}
-}
-
-// takes in e4 outputs 3, 4
-func ConvertCoordinates(coord string) (Position, error) {
-	chars := []rune(coord)
-	if len(chars) != 2 {
-		return Position{}, fmt.Errorf("invalid coordinate length: %s", coord)
-	}
-	col := int(chars[0] - 'a')
-	row := int(chars[1] - '1')
-	if row < 0 || row > 7 || col < 0 || col > 7 {
-		return Position{}, fmt.Errorf("invalid coordinate: %s", coord)
-	}
-	fmt.Printf("Converted %s to row: %d, col: %d\n", coord, row, col)
-	return Position{row: row, col: col}, nil
-}
-
 func GetPiece(b Board, pos Position) (rune, error) {
 	if pos.row < 0 || pos.row > 7 || pos.col < 0 || pos.col > 7 {
 		return '0', fmt.Errorf("invalid position: row %d, col %d", pos.row, pos.col)

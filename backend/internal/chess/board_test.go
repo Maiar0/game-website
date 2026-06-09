@@ -23,21 +23,7 @@ func TestFill(t *testing.T) {
 	require.Equal(t, expected, board)
 }
 
-func TestConvertCoordinates(t *testing.T) {
-	pos, err := ConvertCoordinates("e4")
-	require.NoError(t, err)
-	require.Equal(t, 3, pos.row)
-	require.Equal(t, 4, pos.col)
 
-	_, err = ConvertCoordinates("z9")
-	require.Error(t, err)
-
-	_, err = ConvertCoordinates("a10")
-	require.Error(t, err)
-
-	_, err = ConvertCoordinates("e")
-	require.Error(t, err)
-}
 
 func TestGetPiece(t *testing.T) {
 	var board Board

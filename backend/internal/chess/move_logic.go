@@ -9,35 +9,6 @@ type Direction struct {
 	DY int
 }
 
-func ValidateMove(b Board, from Position, to Position, turnColor rune) (bool, error) {
-	fromP, err := GetPiece(b, from)
-	if err != nil {
-		return false, err
-	}
-	if fromP == '.' {
-		return false, fmt.Errorf("No Piece at From: %v ", from)
-	}
-	if PieceColor(fromP) == turnColor {
-		return false, fmt.Errorf("Not players Piece: %v", from)
-	}
-	toP, err := GetPiece(b, to)
-	if err != nil {
-		return false, err
-	}
-	if PieceColor(toP) == turnColor {
-		return false, fmt.Errorf("Can not capture your own Piece: %v", toP)
-	}
-	validPattern, err := ValidateMovePattern(fromP, from, to)
-	if err != nil {
-		return false, err
-	}
-	if !validPattern {
-		return false, fmt.Errorf("Illegal Move")
-	}
-
-	return true, nil
-}
-
 func ValidateMovePattern(piece rune, from Position, to Position) (bool, error) {
 	dy := from.col - to.col
 	dx := from.row - to.row
@@ -182,6 +153,88 @@ func IsCastlePattern(piece rune, from Position, to Position) bool {
 	case 'k':
 		return from == (Position{row: 7, col: 4}) &&
 			(to == (Position{row: 7, col: 6}) || to == (Position{row: 7, col: 2}))
+	}
+
+	return false
+}
+
+func IsEnPassant(b Board, from Position, to Position, flag string) bool {
+	if flag == "-" {
+		return false
+	}
+	p, _ := GetPiece(b, from)
+	if p != 'p' && p != 'P' {
+		return false
+	}
+	target, _ := GetPiece(b, Position{row: from.row, col: to.col})
+	if PieceColor(p) == PieceColor(target) {
+		return false
+	}
+	flagPos, _ := ConvertCoordinates(flag)
+	if flagPos != to {
+		return false
+	}
+	return true
+}
+
+func IsCapture(b Board, from Position, to Position) bool {
+	fp, _ := GetPiece(b, from)
+	tp, _ := GetPiece(b, to)
+	if fp == '.' || tp == '.' {
+		return false
+	}
+	if PieceColor(fp) == PieceColor(tp) {
+		return false
+	}
+	switch fp {
+	case 'r', 'R', 'b', 'B', 'q', 'Q':
+		if !CheckPath(b, from, to) {
+			return false
+		}
+	case 'p', 'P':
+		if Abs(from.col-to.col) != 1 {
+			return false
+		}
+	}
+	return true
+}
+
+func IsPawnForwardMove(b Board, from Position, to Position) bool {
+	fp, _ := GetPiece(b, from)
+	tp, _ := GetPiece(b, to)
+
+	if from.col != to.col {
+		return false
+	}
+
+	if tp != '.' {
+		return false
+	}
+
+	num := Abs(from.row - to.row)
+
+	switch fp {
+	case 'p':
+		if num == 1 {
+			return true
+		}
+
+		if num == 2 && from.row == 6 {
+			skipped := Position{row: 5, col: from.col}
+			sp, _ := GetPiece(b, skipped)
+			return sp == '.'
+		}
+
+	case 'P':
+		if num == 1 {
+			return true
+		}
+
+		if num == 2 && from.row == 1 {
+			skipped := Position{row: 2, col: from.col}
+			sp, _ := GetPiece(b, skipped)
+			return sp == '.'
+		}
 	}
 
 	return false

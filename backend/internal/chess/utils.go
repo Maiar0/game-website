@@ -31,6 +31,18 @@ func ConvertCoordinates(coord string) (Position, error) {
 	return Position{row: row, col: col}, nil
 }
 
+// takes in pos{row3, col4} output is e4
+func PositionToCoordinate(pos Position) (string, error) {
+	if pos.row < 0 || pos.row > 7 || pos.col < 0 || pos.col > 7 {
+		return "", fmt.Errorf("invalid position: %+v", pos)
+	}
+
+	col := rune('a' + pos.col)
+	row := rune('1' + pos.row)
+
+	return string([]rune{col, row}), nil
+}
+
 func InBounds(pos Position) bool {
 	if pos.row > 7 || pos.row < 0 || pos.col > 7 || pos.col < 0 {
 		return false

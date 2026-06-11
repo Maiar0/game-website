@@ -3,8 +3,17 @@ package chess
 import(
 	"fmt"
 )
+type GameState struct{
+	gameId string
+	placement string
+	turn string
+	castling string
+	enPassant string
+	halfMove string
+	fullMove string
+}
 
-func ValidateMove(b Board, from Position, to Position, turnColor rune) (bool, error) {
+func Move(b Board, from Position, to Position, turnColor rune) (bool, error) {
 	fromP, err := GetPiece(b, from)
 	if err != nil {
 		return false, err

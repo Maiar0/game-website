@@ -9,6 +9,20 @@ import (
 	_ "modernc.org/sqlite"
 )
 
+// CreateDB creates a new SQLite database at the specified path and
+// applies the provided schema.
+//
+// Parameters:
+//   - dbPath: Full path where the database file should be created.
+//     The database must not already exist.
+//   - schema: SQL schema to execute immediately after creation
+//     (CREATE TABLE statements, indexes, etc.).
+//
+// Returns:
+//   - *sql.DB: An open database connection with the schema applied.
+//   - error: An error if the database already exists, the directory
+//     cannot be created, the database cannot be opened, or
+//     the schema fails to execute.
 func CreateDB(dbPath string, schema string) (*sql.DB, error) {
 	//creates DB do not want to open an existing
 	if _, err := os.Stat(dbPath); err == nil {
@@ -32,6 +46,24 @@ func CreateDB(dbPath string, schema string) (*sql.DB, error) {
 	return db, nil
 }
 
+// OpenSQLite opens an existing SQLite database and applies the
+// standard connection and PRAGMA settings used by the application.
+//
+// Parameters:
+//   - path: Full path to an existing SQLite database file.
+//     The database must already exist; this function will
+//     not create a new database.
+//
+// Returns:
+//   - *sql.DB: An open database connection configured with:
+//   - WAL journaling
+//   - 5 second busy timeout
+//   - Foreign key enforcement
+//   - NORMAL synchronous mode
+//   - A small connection pool
+//   - error: An error if the database does not exist, cannot be
+//     opened, PRAGMA configuration fails, or the connection
+//     cannot be verified with Ping().
 func OpenSQLite(path string) (*sql.DB, error) {
 	//ensures we only OPEN databases not create
 	if _, err := os.Stat(path); err != nil {

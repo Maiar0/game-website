@@ -34,25 +34,19 @@ func (b *Board) Fill(fen string) {
 }
 
 func GetPiece(b Board, pos Position) (rune, error) {
-	if !InBounds(pos){
+	if !InBounds(pos) {
 		return '0', fmt.Errorf("Position Out of Bounds: %v", pos)
 	}
 	return b[pos.row][pos.col], nil
 }
 
 func (b *Board) MovePiece(from Position, to Position) error {
-	pieceFrom, err := GetPiece(*b, from)
-	if err != nil {
-		return err
-	}
+	pieceFrom, _ := GetPiece(*b, from)
 	if pieceFrom == '.' {
 		return fmt.Errorf("no piece at from position: row %d, col %d", from.row, from.col)
 	}
 
-	pieceTo, err := GetPiece(*b, to)
-	if err != nil {
-		return err
-	}
+	pieceTo, _ := GetPiece(*b, to)
 	if pieceTo != '.' {
 		return fmt.Errorf("cannot move to position: row %d, col %d, occupied by piece: %c", to.row, to.col, pieceTo)
 	}
@@ -63,25 +57,14 @@ func (b *Board) MovePiece(from Position, to Position) error {
 	return nil
 }
 
-func (b *Board) CapturePiece(from Position, to Position) (rune, error) {
-	pieceFrom, err := GetPiece(*b, from)
-	if err != nil {
-		return '0', err
-	}
-	if pieceFrom == '.' {
-		return '0', fmt.Errorf("no piece at from position: row %d, col %d", from.row, from.col)
+// we will not actually move a piece here we will onyl capture the piece remove specified pos piece from board and return it.
+func (b *Board) CapturePiece(pos Position) (rune, error) {
+	pp, _ := GetPiece(*b, pos)
+	if pp == '.' {
+		return 0, fmt.Errorf("no piece at to position: row %d, col %d", pos.row, pos.col)
 	}
 
-	pieceTo, err := GetPiece(*b, to)
-	if err != nil {
-		return '0', err
-	}
-	if pieceTo == '.' {
-		return '0', fmt.Errorf("no piece at to position: row %d, col %d", to.row, to.col)
-	}
+	b[pos.row][pos.col] = '.'
 
-	b[to.row][to.col] = pieceFrom
-	b[from.row][from.col] = '.'
-
-	return pieceTo, nil
+	return pp, nil
 }

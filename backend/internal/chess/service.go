@@ -43,34 +43,48 @@ func Move(b *Board, from Position, to Position, gs *GameState) (bool, error) {
 	if !validPattern { //checks if move is valid for piece type
 		return false, fmt.Errorf("Illegal Move")
 	}
-	if toP == '.' {
+	if toP == '.' && !IsEnPassant(*b, from, to, gs.EnPassant) {
 		switch fromP {
 		case 'p':
 			if IsPawnForwardMove(*b, from, to) {
 				b.MovePiece(from, to)
-				gs.EnPassant, err = PositionToCoordinate(Position{row: 5, col: to.col})
-				if err != nil {
-					return false, err
+				if Abs(from.row-to.row) == 2 {
+					gs.EnPassant, err = PositionToCoordinate(Position{row: 5, col: to.col})
+					if err != nil {
+						return false, err
+					}
 				}
+			} else {
+				return false, fmt.Errorf("Not valid move")
 			}
-			b.MovePiece(from, to)
 		case 'P':
 			if IsPawnForwardMove(*b, from, to) {
 				b.MovePiece(from, to)
-				gs.EnPassant, err = PositionToCoordinate(Position{row: 2, col: to.col})
+				if Abs(from.row-to.row) == 2 {
+					gs.EnPassant, err = PositionToCoordinate(Position{row: 2, col: to.col})
+				}
 				if err != nil {
 					return false, err
 				}
+			} else {
+				return false, fmt.Errorf("Not valid move")
 			}
-			b.MovePiece(from, to)
 		case 'n', 'N':
 			b.MovePiece(from, to)
 		case 'r', 'R', 'b', 'B', 'q', 'Q':
 			if CheckPath(*b, from, to) {
 				b.MovePiece(from, to)
+			} else {
+				return false, fmt.Errorf("Path blocked cant move")
 			}
 		case 'k', 'K':
 			b.MovePiece(from, to)
+		}
+	} else { //TODO:: THERE IS 100% a better way to do this.
+		if (toP != '.' && IsCapture(*b, from, to)) || IsEnPassant(*b, from, to, gs.EnPassant) {
+
+		} else {
+			return false, fmt.Errorf("Is not move or capture. Illegal Move.")
 		}
 	}
 	//captures
@@ -82,6 +96,8 @@ func Move(b *Board, from Position, to Position, gs *GameState) (bool, error) {
 				if err != nil {
 					return false, err
 				}
+			} else {
+				capturedPiece, _ = b.CapturePiece(to)
 			}
 			b.MovePiece(from, to)
 		case 'P':
@@ -90,6 +106,8 @@ func Move(b *Board, from Position, to Position, gs *GameState) (bool, error) {
 				if err != nil {
 					return false, err
 				}
+			} else {
+				capturedPiece, _ = b.CapturePiece(to)
 			}
 			b.MovePiece(from, to)
 		case 'n', 'N':
@@ -105,6 +123,8 @@ func Move(b *Board, from Position, to Position, gs *GameState) (bool, error) {
 					return false, err
 				}
 				b.MovePiece(from, to)
+			} else {
+				return false, fmt.Errorf("Path blocked cant move")
 			}
 		case 'k', 'K':
 			b.MovePiece(from, to)
@@ -113,8 +133,8 @@ func Move(b *Board, from Position, to Position, gs *GameState) (bool, error) {
 	if capturedPiece != '.' {
 		gs.CapturedPieces = append(gs.CapturedPieces, capturedPiece)
 	}
-	
-	if (fromP == 'p' || fromP == 'P') && Abs(from.row-to.row) == 2 {
+
+	if (fromP == 'p' || fromP == 'P') && Abs(from.row-to.row) == 2 { //TODO:: We are setting this twice re vist
 		ep := Position{
 			row: (from.row + to.row) / 2,
 			col: from.col,
@@ -124,6 +144,8 @@ func Move(b *Board, from Position, to Position, gs *GameState) (bool, error) {
 		if err != nil {
 			return false, err
 		}
+	} else {
+		gs.EnPassant = "-"
 	}
 
 	return true, nil

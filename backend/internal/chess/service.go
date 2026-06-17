@@ -130,6 +130,15 @@ func Move(b *Board, from Position, to Position, gs *GameState) (bool, error) {
 			b.MovePiece(from, to)
 		}
 	}
+
+	k, err := GetKing(*b, gs.Turn)
+	if err != nil {
+		return false, err
+	}
+	if IsSquareAttacked(*b, k, gs.Turn) {
+		return false, fmt.Errorf("King is in check: %v", k)
+	}
+
 	if capturedPiece != '.' {
 		gs.CapturedPieces = append(gs.CapturedPieces, capturedPiece)
 	}

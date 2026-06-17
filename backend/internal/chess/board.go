@@ -33,6 +33,17 @@ func (b *Board) Fill(fen string) {
 	}
 }
 
+func GetKing(b Board, color rune) (Position, error) {
+	for i, row := range b {
+		for o, p := range row {
+			if (p == 'k' || p == 'K') && PieceColor(p) == color {
+				return Position{row: i, col: o}, nil
+			}
+		}
+	}
+	return Position{row: -1, col: -1}, fmt.Errorf("GetKing: King not found")
+}
+
 func GetPiece(b Board, pos Position) (rune, error) {
 	if !InBounds(pos) {
 		return '0', fmt.Errorf("Position Out of Bounds: %v", pos)

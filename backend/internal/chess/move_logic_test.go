@@ -104,7 +104,7 @@ func TestIsSquareAttacked(t *testing.T) {
 		{
 			name:        "attacked by black rook vertical negative direction",
 			pos:         Position{row: 4, col: 4},
-			attackColor: 'b',
+			attackColor: 'w',
 			pieces: map[Position]rune{
 				Position{row: 1, col: 4}: 'r',
 			},
@@ -113,7 +113,7 @@ func TestIsSquareAttacked(t *testing.T) {
 		{
 			name:        "attacked by black queen vertical positive direction",
 			pos:         Position{row: 4, col: 4},
-			attackColor: 'b',
+			attackColor: 'w',
 			pieces: map[Position]rune{
 				Position{row: 7, col: 4}: 'q',
 			},
@@ -122,7 +122,7 @@ func TestIsSquareAttacked(t *testing.T) {
 		{
 			name:        "attacked by white bishop diagonal negative positive",
 			pos:         Position{row: 4, col: 4},
-			attackColor: 'w',
+			attackColor: 'b',
 			pieces: map[Position]rune{
 				Position{row: 2, col: 6}: 'B',
 			},
@@ -131,7 +131,7 @@ func TestIsSquareAttacked(t *testing.T) {
 		{
 			name:        "attacked by white queen diagonal positive positive",
 			pos:         Position{row: 4, col: 4},
-			attackColor: 'w',
+			attackColor: 'b',
 			pieces: map[Position]rune{
 				Position{row: 6, col: 6}: 'Q',
 			},
@@ -140,7 +140,7 @@ func TestIsSquareAttacked(t *testing.T) {
 		{
 			name:        "attacked by black knight",
 			pos:         Position{row: 4, col: 4},
-			attackColor: 'b',
+			attackColor: 'w',
 			pieces: map[Position]rune{
 				Position{row: 6, col: 5}: 'n',
 			},
@@ -149,7 +149,7 @@ func TestIsSquareAttacked(t *testing.T) {
 		{
 			name:        "same color requested ignores opposite color rook",
 			pos:         Position{row: 4, col: 4},
-			attackColor: 'b',
+			attackColor: 'w',
 			pieces: map[Position]rune{
 				Position{row: 1, col: 4}: 'R',
 			},
@@ -158,7 +158,7 @@ func TestIsSquareAttacked(t *testing.T) {
 		{
 			name:        "blocked rook does not attack",
 			pos:         Position{row: 4, col: 4},
-			attackColor: 'b',
+			attackColor: 'w',
 			pieces: map[Position]rune{
 				Position{row: 3, col: 4}: 'p',
 				Position{row: 1, col: 4}: 'r',
@@ -168,7 +168,7 @@ func TestIsSquareAttacked(t *testing.T) {
 		{
 			name:        "first piece in direction not attacking piece",
 			pos:         Position{row: 4, col: 4},
-			attackColor: 'b',
+			attackColor: 'w',
 			pieces: map[Position]rune{
 				Position{row: 1, col: 4}: 'b',
 			},
@@ -177,14 +177,14 @@ func TestIsSquareAttacked(t *testing.T) {
 		{
 			name:        "empty board not attacked",
 			pos:         Position{row: 4, col: 4},
-			attackColor: 'b',
+			attackColor: 'w',
 			pieces:      nil,
 			want:        false,
 		},
 		{
 			name:        "knight outside checked bounds safely",
 			pos:         Position{row: 0, col: 0},
-			attackColor: 'b',
+			attackColor: 'w',
 			pieces: map[Position]rune{
 				Position{row: 2, col: 1}: 'n',
 			},

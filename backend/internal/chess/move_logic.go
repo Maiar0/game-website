@@ -91,7 +91,13 @@ var knightDirections = []Direction{
 	{DX: -1, DY: -2},
 }
 
-func IsSquareAttacked(b Board, pos Position, attackColor rune) bool {
+func IsSquareAttacked(b Board, pos Position, turn rune) bool {
+	attackColor := '0'
+	if turn == 'w' {
+		attackColor = 'b'
+	} else {
+		attackColor = 'w'
+	}
 	//west
 	p, _, found := FindPieceInDirection(b, pos, -1, 0)
 	if found && PieceColor(p) == attackColor {

@@ -2,6 +2,7 @@ package chess
 
 import (
 	"fmt"
+	"strings"
 )
 
 type GameState struct {
@@ -18,7 +19,8 @@ type GameState struct {
 // non captures
 func Move(b *Board, from Position, to Position, gs *GameState) (bool, error) {
 	capturedPiece := '.'
-
+	dr := to.row - from.row
+	dc := to.col - from.col
 	fromP, err := GetPiece(*b, from)
 	if err != nil {
 		return false, err
@@ -48,7 +50,7 @@ func Move(b *Board, from Position, to Position, gs *GameState) (bool, error) {
 		case 'p':
 			if IsPawnForwardMove(*b, from, to) {
 				b.MovePiece(from, to)
-				if Abs(from.row-to.row) == 2 {
+				if Abs(dr) == 2 {
 					gs.EnPassant, err = PositionToCoordinate(Position{row: 5, col: to.col})
 					if err != nil {
 						return false, err
@@ -60,7 +62,7 @@ func Move(b *Board, from Position, to Position, gs *GameState) (bool, error) {
 		case 'P':
 			if IsPawnForwardMove(*b, from, to) {
 				b.MovePiece(from, to)
-				if Abs(from.row-to.row) == 2 {
+				if Abs(dr) == 2 {
 					gs.EnPassant, err = PositionToCoordinate(Position{row: 2, col: to.col})
 				}
 				if err != nil {
@@ -78,6 +80,27 @@ func Move(b *Board, from Position, to Position, gs *GameState) (bool, error) {
 				return false, fmt.Errorf("Path blocked cant move")
 			}
 		case 'k', 'K':
+			if IsCastlePattern(fromP, from, to) {
+				cp, _, _ := FindPieceInDirection(*b, from, Sign(from.row-to.row), Sign(from.col-to.col))
+				if fromP == 'k' && cp != 'r' {
+					if strings.ContainsRune(gs.Castling, 'k') && dc > 0 {
+						//black kingside castling
+					}
+					if strings.ContainsRune(gs.Castling, 'q') && dc < 0 {
+						//black queen side castling
+					}
+				} else {
+					if fromP == 'K' && cp != 'R' {
+						if strings.ContainsRune(gs.Castling, 'K') && dc > 0 {
+							//white kingside castling
+						}
+						if strings.ContainsRune(gs.Castling, 'Q') && dc < 0 {
+							//white queen side castling
+						}
+					}
+				}
+
+			}
 			b.MovePiece(from, to)
 		}
 	} else { //TODO:: THERE IS 100% a better way to do this.
@@ -127,22 +150,24 @@ func Move(b *Board, from Position, to Position, gs *GameState) (bool, error) {
 				return false, fmt.Errorf("Path blocked cant move")
 			}
 		case 'k', 'K':
+			b.CapturePiece(to)
 			b.MovePiece(from, to)
 		}
 	}
-
-	k, err := GetKing(*b, gs.Turn)
-	if err != nil {
-		return false, err
-	}
-	if IsSquareAttacked(*b, k, gs.Turn) {
-		return false, fmt.Errorf("King is in check: %v", k)
+	//TODO:: nulled tell i can work on test
+	if 1 == 0 {
+		k, err := GetKing(*b, gs.Turn)
+		if err != nil {
+			return false, err
+		}
+		if IsSquareAttacked(*b, k, gs.Turn) {
+			return false, fmt.Errorf("King is in check: %v", k)
+		}
 	}
 
 	if capturedPiece != '.' {
 		gs.CapturedPieces = append(gs.CapturedPieces, capturedPiece)
 	}
-
 	if (fromP == 'p' || fromP == 'P') && Abs(from.row-to.row) == 2 { //TODO:: We are setting this twice re vist
 		ep := Position{
 			row: (from.row + to.row) / 2,

@@ -81,27 +81,41 @@ func Move(b *Board, from Position, to Position, gs *GameState) (bool, error) {
 			}
 		case 'k', 'K':
 			if IsCastlePattern(fromP, from, to) {
-				cp, _, _ := FindPieceInDirection(*b, from, Sign(from.row-to.row), Sign(from.col-to.col))
-				if fromP == 'k' && cp != 'r' {
+				if IsSquareAttacked(*b, from, gs.Turn) ||
+					IsSquareAttacked(*b, Position{row: from.row + Sign(dr), col: from.col + Sign(dc)}, gs.Turn) ||
+					IsSquareAttacked(*b, to, gs.Turn) {
+					return false, fmt.Errorf("Illegal Castling path is underattack")
+				}
+				cp, cpos, _ := FindPieceInDirection(*b, from, Sign(dr), Sign(dc))
+				if fromP == 'k' && cp == 'r' {
 					if strings.ContainsRune(gs.Castling, 'k') && dc > 0 {
-						//black kingside castling
+						b.MovePiece(from, to)
+						b.MovePiece(cpos, Position{row: from.row, col: (to.col - 1)})
+						break
+
 					}
 					if strings.ContainsRune(gs.Castling, 'q') && dc < 0 {
-						//black queen side castling
-					}
-				} else {
-					if fromP == 'K' && cp != 'R' {
-						if strings.ContainsRune(gs.Castling, 'K') && dc > 0 {
-							//white kingside castling
-						}
-						if strings.ContainsRune(gs.Castling, 'Q') && dc < 0 {
-							//white queen side castling
-						}
+						b.MovePiece(from, to)
+						b.MovePiece(cpos, Position{row: from.row, col: (to.col + 1)})
+						break
 					}
 				}
-
+				if fromP == 'K' && cp == 'R' {
+					if strings.ContainsRune(gs.Castling, 'K') && dc > 0 {
+						b.MovePiece(from, to)
+						b.MovePiece(cpos, Position{row: from.row, col: (to.col - 1)})
+						break
+					}
+					if strings.ContainsRune(gs.Castling, 'Q') && dc < 0 {
+						b.MovePiece(from, to)
+						b.MovePiece(cpos, Position{row: from.row, col: (to.col + 1)})
+						break
+					}
+				}
+				return false, fmt.Errorf("illegal castling")
+			} else {
+				b.MovePiece(from, to)
 			}
-			b.MovePiece(from, to)
 		}
 	} else { //TODO:: THERE IS 100% a better way to do this.
 		if (toP != '.' && IsCapture(*b, from, to)) || IsEnPassant(*b, from, to, gs.EnPassant) {
@@ -161,7 +175,7 @@ func Move(b *Board, from Position, to Position, gs *GameState) (bool, error) {
 			return false, err
 		}
 		if IsSquareAttacked(*b, k, gs.Turn) {
-			return false, fmt.Errorf("King is in check: %v", k)
+			return false, fmt.Errorf("King is in check, king can not end move in check: %v", k)
 		}
 	}
 

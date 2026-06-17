@@ -129,3 +129,59 @@ func TestCapturePiece(t *testing.T) {
 		})
 	}
 }
+
+func TestGetKing(t *testing.T) {
+	tests := []struct {
+		name    string
+		fen     string
+		color   rune
+		wantPos Position
+		wantErr bool
+	}{
+		{
+			name:    "find white king",
+			fen:     "4k3/8/8/8/8/8/8/4K3 w - - 0 1",
+			color:   'w',
+			wantPos: Position{row: 0, col: 4},
+			wantErr: false,
+		},
+		{
+			name:    "find black king",
+			fen:     "4k3/8/8/8/8/8/8/4K3 w - - 0 1",
+			color:   'b',
+			wantPos: Position{row: 7, col: 4},
+			wantErr: false,
+		},
+		{
+			name:    "white king missing",
+			fen:     "4k3/8/8/8/8/8/8/8 w - - 0 1",
+			color:   'w',
+			wantPos: Position{row: -1, col: -1},
+			wantErr: true,
+		},
+		{
+			name:    "black king missing",
+			fen:     "8/8/8/8/8/8/8/4K3 w - - 0 1",
+			color:   'b',
+			wantPos: Position{row: -1, col: -1},
+			wantErr: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			var b Board
+			b.Fill(tt.fen)
+
+			got, err := b.GeKing(tt.color)
+
+			if tt.wantErr {
+				require.Error(t, err)
+			} else {
+				require.NoError(t, err)
+			}
+
+			require.Equal(t, tt.wantPos, got)
+		})
+	}
+}

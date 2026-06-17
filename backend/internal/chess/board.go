@@ -40,6 +40,17 @@ func GetPiece(b Board, pos Position) (rune, error) {
 	return b[pos.row][pos.col], nil
 }
 
+func (b *Board) GeKing(color rune) (Position, error) {
+	for i, row := range b {
+		for o, p := range row {
+			if (p == 'k' || p == 'K') && PieceColor(p) == color {
+				return Position{row: i, col: o}, nil
+			}
+		}
+	}
+	return Position{row: -1, col: -1}, fmt.Errorf("GetKing: King not found")
+}
+
 func (b *Board) MovePiece(from Position, to Position) error {
 	pieceFrom, _ := GetPiece(*b, from)
 	if pieceFrom == '.' {
